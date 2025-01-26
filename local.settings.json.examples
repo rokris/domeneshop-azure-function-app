@@ -1,0 +1,15 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "python",
+    "DOMENESHOP_API_TOKEN": "xxxxxxxxxxxxx",
+    "DOMENESHOP_API_SECRET": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    "WEBSITES_ENABLE_APP_SERVICE_STORAGE": false
+  },
+  "Host": {
+    "LocalHttpPort": 7071,
+    "CORS": "*",
+    "CORSCredentials": false
+  }
+}
