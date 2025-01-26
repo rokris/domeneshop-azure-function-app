@@ -142,6 +142,7 @@ terraform.tfstate.backup
 terraform.tfvars
 
 # VSCode
+.vscode
 
 # Local test catalog
 test/
