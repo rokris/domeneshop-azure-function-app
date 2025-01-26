@@ -145,3 +145,6 @@ terraform.tfvars
 
 # Local test catalog
 test/
+
+# Mac
+.DS_Store
