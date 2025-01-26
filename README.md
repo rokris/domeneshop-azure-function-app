@@ -27,14 +27,6 @@ az role assignment create \
 
 ---
 
-Replace the placeholders:
-
-- `<FUNCTION_APP_NAME>`: The name of your Azure Function App.
-- `<RESOURCE_GROUP_NAME>`: The resource group where your Function App is hosted.
-- Replace `xxxxxxxxxxx` with your actual **Domeneshop API Token** and **API Secret**.
-
----
-
 ## **Usage Example with HTTPie**
 
 You can interact with the Azure Function using **HTTPie**. Below is an example of how to make a request to add a DNS TXT record:
@@ -83,7 +75,6 @@ This file is used to store environment variables for local development. Below is
   }
 }
 ```
-
 ---
 
 ## **Notes**
