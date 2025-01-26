@@ -9,9 +9,10 @@ This Azure Function enables the addition of DNS TXT records to the Domeneshop DN
 - Clone the GitHub repo
 - Create DOMENESHOP_API_TOKEN and DOMENESHOP_API_SECRET at Domeneshop website
 - Create a Service Principal
-- Run the Terraform to create the Azure Function App
+- Run the Terraform to create the Azure Function App (use SP values)
 - Create a Managed Identity in Azure
-- Configure the Deployment Center in Azure Funtion App
+- Store Federated credentials in GitHub secrets
+- Configure the Deployment Center in Azure Funtion App using Managed Identity
 
 ```bash
 az ad sp create-for-rbac --name "github-terraform-deploy" --role Contributor --scopes /subscriptions/<subscription-id> --json-auth
