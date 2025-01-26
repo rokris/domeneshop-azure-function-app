@@ -14,7 +14,14 @@ This Azure Function enables the addition of DNS TXT records to the Domeneshop DN
 - Configure the Deployment Center in Azure Funtion App
 
 ```bash
-az ad sp create-for-rbac --name "github-terraform-deploy" --role Contributor --scopes /subscriptions/edbad54f-b52a-4f78-9016-0ac27a6fee55 --json-auth
+az ad sp create-for-rbac --name "github-terraform-deploy" --role Contributor --scopes /subscriptions/<subscription-id> --json-auth
+```
+
+```bash
+az role assignment create \
+  --assignee <client-id> \
+  --role "Website Contributor" \
+  --scope /subscriptions/<subscription-id>/resourceGroups/<resource-group-name>
 ```
 
 ---
