@@ -22,7 +22,7 @@ az ad sp create-for-rbac --name "github-terraform-deploy" --role Contributor --s
 az role assignment create \
   --assignee cbb206df-ab25-4f45-9c6c-02a0f1da103e \
   --role "User Access Administrator" \
-  --scope /subscriptions/edbad54f-b52a-4f78-9016-0ac27a6fee55/resourceGroups/ng-ti-test-rokris-domeneshop-azure-rg
+  --scope /subscriptions/edbad54f-b52a-4f78-9016-0ac27a6fee55
 ```
 
 ---
