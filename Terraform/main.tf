@@ -6,6 +6,11 @@ terraform {
       source  = "hashicorp/azurerm"
       version = ">= 3.50.0"
     }
+
+    github = {
+      source  = "integrations/github"
+      version = ">= 4.0.0"
+    }
   }
 }
 
@@ -16,6 +21,10 @@ provider "azurerm" {
   client_id       = var.client_id
   client_secret   = var.client_secret
   tenant_id       = var.tenant_id
+}
+
+provider "github" {
+  owner = var.github_organization_name
 }
 
 resource "azurerm_resource_group" "rg" {
@@ -42,6 +51,28 @@ resource "azurerm_federated_identity_credential" "fc" {
   audience            = ["api://AzureADTokenExchange"] # Common audience for OIDC
   issuer              = "https://token.actions.githubusercontent.com" # Replace with your identity provider's issuer
   subject             = "repo:rokris/domeneshop-azure-function-app:ref:refs/heads/master" # Replace with your specific repo and branch
+}
+
+data "github_repository" "this" {
+  name = var.github_repository_name
+}
+
+resource "github_actions_secret" "azure_client_id" {
+  repository      = data.github_repository.this.name
+  secret_name     = "AZUREAPPSERVICE_CLIENTID"
+  plaintext_value = azurerm_user_assigned_identity.base.client_id
+}
+
+resource "github_actions_secret" "azure_tenant_id" {
+  repository      = data.github_repository.this.name
+  secret_name     = "AZUREAPPSERVICE_TENANTID"
+  plaintext_value = azurerm_user_assigned_identity.base.tenant_id
+}
+
+resource "github_actions_secret" "azure_subscription_id" {
+  repository      = data.github_repository.this.name
+  secret_name     = "AZUREAPPSERVICE_SUBSCRIPTIONID"
+  plaintext_value = var.azure_subscription_id 
 }
 
 resource "azurerm_storage_account" "sa" {

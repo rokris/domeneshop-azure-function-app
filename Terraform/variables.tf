@@ -28,3 +28,15 @@ variable "domeneshop_api_secret" {
   type        = string
   sensitive   = true
 }
+variable "github_organization_name" {
+  description = "GitHub organization (or user)"
+  type        = string
+}
+variable "github_repository_name" {
+  description = "The GitHub repository to set up workload identity for"
+  type        = string
+}
+variable "azure_subscription_id" {
+  description = "What Azure subscription should the workload identity have access to?"
+  type        = string
+}
