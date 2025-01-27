@@ -41,12 +41,20 @@ http POST https://<FUNCTION_APP_NAME>.azurewebsites.net/api/<FUNCTION_NAME> \
     ttl:=3600 --> optional
 ```
 
+```bash
+http DELETE https://<FUNCTION_APP_NAME>.azurewebsites.net/api/<FUNCTION_NAME> \
+     x-functions-key:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx \
+     Content-Type:application/json \
+     domain_id= \
+     record_id=
+```
+
 Replace the following:
 
 - `<FUNCTION_APP_NAME>`: The name of your Azure Function App.
 - `<FUNCTION_NAME>`: The name of your Azure Function.
 - `xxxxxxxxxxxxxxxxxxxxxxxxx`: The Function Key for authentication.
-- Update `domain_id`, `record_name`, and `txt_value` with your actual values.
+- Update `domain_id`, `record_id`, record_name`, and `txt_value` with your actual values.
 
 ---
 
