@@ -8,6 +8,9 @@ on:
   push:
     branches:
       - master
+    paths-ignore:
+      - 'Terraform/**'  # Ignore any changes inside the Terraform directory
+      - '.github/workflows/**' # Ignore changes in the GitHub workflows directory
   workflow_dispatch:
 
 env:
