@@ -1,7 +1,7 @@
 name: Terraform Azure Deployment
 
 on:
-  workflow_dispatch: # Allows manual triggering of the workflow
+  workflow_dispatch:
     inputs:
       auto_apply:
         description: 'Automatically apply Terraform changes after planning'
@@ -22,13 +22,13 @@ jobs:
     - name: Set up Terraform
       uses: hashicorp/setup-terraform@v2
       with:
-        terraform_version: 1.10.5 # Update to your preferred Terraform version
+        terraform_version: 1.10.5
 
     # Step 3: Parse Azure Service Principal JSON
     - name: Parse Azure SP JSON
       id: parse-sp-json
       run: |
-        echo "SP_JSON=$(echo '${{ secrets.AZURE_SP_JSON }}' | jq -c .)" >> $GITHUB_ENV
+        echo "SP_JSON='${{ secrets.AZURE_SP_JSON }}'" >> $GITHUB_ENV
         echo "ARM_CLIENT_ID=$(echo $SP_JSON | jq -r '.clientId')" >> $GITHUB_ENV
         echo "ARM_CLIENT_SECRET=$(echo $SP_JSON | jq -r '.clientSecret')" >> $GITHUB_ENV
         echo "ARM_SUBSCRIPTION_ID=$(echo $SP_JSON | jq -r '.subscriptionId')" >> $GITHUB_ENV
@@ -38,7 +38,7 @@ jobs:
         echo "TF_VAR_subscription_id=$(echo $SP_JSON | jq -r '.subscriptionId')" >> $GITHUB_ENV
         echo "TF_VAR_tenant_id=$(echo $SP_JSON | jq -r '.tenantId')" >> $GITHUB_ENV
 
-    # Step 4: Debug environment variables (optional, for troubleshooting)
+    # Step 4: Debug environment variables
     - name: Debug Environment Variables
       run: |
         echo "ARM_CLIENT_ID=$ARM_CLIENT_ID"
@@ -62,7 +62,7 @@ jobs:
     # Step 5: Initialize Terraform
     - name: Initialize Terraform
       run: terraform init
-      working-directory: ./Terraform # Path to your Terraform directory
+      working-directory: ./Terraform
 
     # Step 6: Terraform Plan
     - name: Terraform Plan
