@@ -1,3 +1,14 @@
+terraform {
+  required_version = ">=1.2"
+
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = ">= 3.50.0"
+    }
+  }
+}
+
 provider "azurerm" {
   features {}
 
@@ -10,6 +21,21 @@ provider "azurerm" {
 resource "azurerm_resource_group" "rg" {
   name     = "ng-ti-test-rokris-domeneshop-azure-rg"
   location = "Norway East"
+}
+
+resource "azurerm_user_assigned_identity" "base" {
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg.location
+  name                = "ng-ti-rokris-github-azure-mi"
+}
+
+resource "azurerm_federated_identity_credential" "fc" {
+  name                = "rokris-domeneshop-azure-function-app"
+  parent_id           = azurerm_user_assigned_identity.base.id
+  resource_group_name = azurerm_resource_group.rg.name
+  audience            = ["api://AzureADTokenExchange"] # Common audience for OIDC
+  issuer              = "https://token.actions.githubusercontent.com" # Replace with your identity provider's issuer
+  subject             = "repo:rokris/domeneshop-azure-function-app:ref:refs/heads/master" # Replace with your specific repo and branch
 }
 
 resource "azurerm_storage_account" "sa" {
