@@ -29,6 +29,12 @@ resource "azurerm_user_assigned_identity" "base" {
   name                = "ng-ti-rokris-github-azure-mi"
 }
 
+resource "azurerm_role_assignment" "role" {
+  principal_id         = azurerm_user_assigned_identity.base.principal_id
+  role_definition_name = "Website Contributor"
+  scope                = azurerm_resource_group.rg.id
+}
+
 resource "azurerm_federated_identity_credential" "fc" {
   name                = "rokris-domeneshop-azure-function-app"
   parent_id           = azurerm_user_assigned_identity.base.id
