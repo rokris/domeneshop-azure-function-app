@@ -22,13 +22,13 @@ jobs:
     - name: Set up Terraform
       uses: hashicorp/setup-terraform@v2
       with:
-        terraform_version: 1.10.5
+        terraform_version: 1.5.6
 
     # Step 3: Parse Azure Service Principal JSON
     - name: Parse Azure SP JSON
       id: parse-sp-json
       run: |
-        echo "SP_JSON='${{ secrets.AZURE_SP_JSON }}'" >> $GITHUB_ENV
+        SP_JSON='${{ secrets.AZURE_SP_JSON }}'
         echo "ARM_CLIENT_ID=$(echo $SP_JSON | jq -r '.clientId')" >> $GITHUB_ENV
         echo "ARM_CLIENT_SECRET=$(echo $SP_JSON | jq -r '.clientSecret')" >> $GITHUB_ENV
         echo "ARM_SUBSCRIPTION_ID=$(echo $SP_JSON | jq -r '.subscriptionId')" >> $GITHUB_ENV
