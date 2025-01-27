@@ -9,8 +9,9 @@ on:
     branches:
       - master
     paths-ignore:
-      - 'Terraform/**'  # Ignore any changes inside the Terraform directory
-      - '.github/workflows/**' # Ignore changes in the GitHub workflows directory
+      - 'README.md'            # Exclude the README.md file
+      - 'Terraform/**'         # Exclude the Terraform directory
+      - '.github/workflows/**' # Exclude the GitHub workflows directory
   workflow_dispatch:
 
 env:
