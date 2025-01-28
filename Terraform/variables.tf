@@ -38,3 +38,7 @@ variable "github_repository_name" {
   type        = string
   default     = "domeneshop-azure-function-app"
 }
+variable "github_token" {
+  description = "GitHub Personal Access Token with admin rights"
+  type        = string
+}

@@ -24,6 +24,7 @@ provider "azurerm" {
 }
 
 provider "github" {
+  token = var.github_token
   owner = var.github_organization_name
 }
 
