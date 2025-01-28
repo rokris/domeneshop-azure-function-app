@@ -23,6 +23,11 @@ provider "azurerm" {
   tenant_id       = var.tenant_id
 }
 
+variable "client_id" {}
+variable "client_secret" {}
+variable "subscription_id" {}
+variable "tenant_id" {}
+
 provider "github" {
   owner = var.github_organization_name
 }
