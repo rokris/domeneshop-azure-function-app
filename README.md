@@ -8,7 +8,9 @@ This Azure Function enables the addition of DNS TXT records to the Domeneshop DN
 
 - Clone the GitHub repo
 - Create DOMENESHOP_API_TOKEN and DOMENESHOP_API_SECRET at Domeneshop website
+  * Store token and secret in Github Secrets
 - Create a Service Principal
+  * Store the JSON in Github secrets under AZURE_SP_JSON
 
 ```bash
 az ad sp create-for-rbac --name "github-terraform-deploy" --role Contributor --scopes /subscriptions/<subscription-id> --json-auth
@@ -21,15 +23,12 @@ az role assignment create \
   --scope /subscriptions/edbad54f-b52a-4f78-9016-0ac27a6fee55
 ```
 
-- Run the Terraform to create the Azure Function App (use SP values)
-  - terraform init, terraform plan, terraform apply
-- Store Managed Identity in GitHub secrets actions
-  - AZUREAPPSERVICE_CLIENTID
-  - AZUREAPPSERVICE_SUBSCRIPTIONID
-  - AZUREAPPSERVICE_TENANTID
-
-- Force GitHub workflow to run the first time.
-  - Build and deploy Python project to Azure Function App - domeneshop-azure-function-app
+- Create GitHub Personal access tokens (classic) ( repo, workflow, admin:repo_hook ? )
+  * Store tokens in Github Secrets under name TERRAFORM_GITHUB_TOKEN 
+- Run the workflow "Terraform Azure Deployment" to create the Azure resources (Run the workflow only once).
+  * Parameter = false, will abort running after the planning step.
+- Run GitHub workflow
+  * Build and deploy Python project to Azure Function App - domeneshop-azure-function-app
 
 ---
 
