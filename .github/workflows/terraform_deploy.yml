@@ -1,4 +1,4 @@
-name: Terraform Azure Deployment with Local State Management
+name: Terraform Azure Deployment
 
 on:
   workflow_dispatch:
