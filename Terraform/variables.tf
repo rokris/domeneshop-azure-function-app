@@ -39,5 +39,4 @@ variable "github_repository_name" {
 variable "azure_subscription_id" {
   description = "What Azure subscription should the workload identity have access to?"
   type        = string
-  default     = "edbad54f-b52a-4f78-9016-0ac27a6fee55"
 }
