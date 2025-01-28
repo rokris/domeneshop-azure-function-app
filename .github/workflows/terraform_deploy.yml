@@ -24,7 +24,11 @@ jobs:
         with:
           terraform_version: 1.10.5
 
-      # Step 3: Parse Azure Service Principal JSON
+      # Step 3: Set GitHub Token for Managing Secrets
+      - name: Set GitHub Token
+        run: echo "TF_VAR_terraform_github_token=${{ secrets.TERRAFORM_GITHUB_TOKEN }}" >> $GITHUB_ENV
+
+      # Step 4: Parse Azure Service Principal JSON
       - name: Parse Azure SP JSON
         id: parse-sp-json
         run: |
@@ -38,20 +42,20 @@ jobs:
           echo "TF_VAR_subscription_id=$(echo $SP_JSON | jq -r '.subscriptionId')" >> $GITHUB_ENV
           echo "TF_VAR_tenant_id=$(echo $SP_JSON | jq -r '.tenantId')" >> $GITHUB_ENV
 
-      # Step 3.1: Read Domeneshop token and secret into environment variables
+      # Step 4.1: Read Domeneshop token and secret into environment variables
       - name: Read Domeneshop token and secret into environment variables
         run: |
           echo "TF_VAR_DOMENESHOP_API_TOKEN=${{ secrets.DOMENESHOP_API_TOKEN }}" >> $GITHUB_ENV
           echo "TF_VAR_DOMENESHOP_API_SECRET=${{ secrets.DOMENESHOP_API_SECRET }}" >> $GITHUB_ENV
 
-      # Step 3.2: Download previous Terraform state artifact (if available)
+      # Step 4.2: Download previous Terraform state artifact (if available)
       - name: Download Terraform State
         uses: actions/download-artifact@v3
         with:
           name: terraform-state
         continue-on-error: true
 
-      # Step 4: Debug environment variables
+      # Step 5: Debug environment variables
       - name: Debug Environment Variables
         run: |
           echo "ARM_CLIENT_ID=$ARM_CLIENT_ID"
@@ -75,13 +79,14 @@ jobs:
           TF_VAR_tenant_id: ${{ env.TF_VAR_tenant_id }}
           TF_VAR_domeneshop_api_token: ${{ env.TF_VAR_domeneshop_api_token }}
           TF_VAR_domeneshop_api_secret: ${{ env.TF_VAR_domeneshop_api_secret }}
+          TF_VAR_terraform_github_token: ${{ env.TF_VAR_terraform_github_token }}
 
-      # Step 5: Initialize Terraform
+      # Step 6: Initialize Terraform
       - name: Initialize Terraform
         run: terraform init
         working-directory: ./Terraform
 
-      # Step 6: Terraform Plan
+      # Step 7: Terraform Plan
       - name: Terraform Plan
         run: terraform plan -out=tfplan
         working-directory: ./Terraform
@@ -92,8 +97,9 @@ jobs:
           TF_VAR_tenant_id: ${{ env.TF_VAR_tenant_id }}
           TF_VAR_domeneshop_api_token: ${{ env.TF_VAR_domeneshop_api_token }}
           TF_VAR_domeneshop_api_secret: ${{ env.TF_VAR_domeneshop_api_secret }}
+          TF_VAR_terraform_github_token: ${{ env.TF_VAR_terraform_github_token }}
 
-      # Step 7: Terraform Apply
+      # Step 8: Terraform Apply
       - name: Terraform Apply
         if: github.event.inputs.auto_apply == 'true' || github.event.inputs.auto_apply == true
         run: terraform apply -auto-approve tfplan
@@ -105,8 +111,9 @@ jobs:
           TF_VAR_tenant_id: ${{ env.TF_VAR_tenant_id }}
           TF_VAR_domeneshop_api_token: ${{ env.TF_VAR_domeneshop_api_token }}
           TF_VAR_domeneshop_api_secret: ${{ env.TF_VAR_domeneshop_api_secret }}
+          TF_VAR_terraform_github_token: ${{ env.TF_VAR_terraform_github_token }}
 
-      # Step 8: Upload Terraform State
+      # Step 9: Upload Terraform State
       - name: Upload Terraform State
         uses: actions/upload-artifact@v3
         with:
