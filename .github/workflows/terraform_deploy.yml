@@ -55,6 +55,13 @@ jobs:
           name: terraform-state
         continue-on-error: true
 
+      # Step 4.3: Ensure Terraform State File Exists
+      - name: Ensure Terraform State File Exists
+        run: |
+          if [ ! -f ./Terraform/terraform.tfstate ]; then
+            echo "{}" > ./Terraform/terraform.tfstate
+          fi
+
       # Step 5: Debug environment variables
       - name: Debug Environment Variables
         run: |
@@ -116,7 +123,7 @@ jobs:
 
       # Step 9: Upload Terraform State
       - name: Upload Terraform State
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: terraform-state
           path: ./Terraform/terraform.tfstate
