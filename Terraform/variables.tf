@@ -1,23 +1,23 @@
-# variable "subscription_id" {
-#   description = "The Azure SP subscription ID"
-#   type        = string
-#   sensitive   = true
-# }
-# variable "client_id" {
-#   description = "The Azure SP client ID"
-#   type        = string
-#   sensitive   = true
-# }
-# variable "client_secret" {
-#   description = "The Azure SP client secret"
-#   type        = string
-#   sensitive   = true
-# }
-# variable "tenant_id" {
-#   description = "The Azure SP tenant ID"
-#   type        = string
-#   sensitive   = true
-# }
+variable "subscription_id" {
+  description = "The Azure SP subscription ID"
+  type        = string
+  sensitive   = true
+}
+variable "client_id" {
+  description = "The Azure SP client ID"
+  type        = string
+  sensitive   = true
+}
+variable "client_secret" {
+  description = "The Azure SP client secret"
+  type        = string
+  sensitive   = true
+}
+variable "tenant_id" {
+  description = "The Azure SP tenant ID"
+  type        = string
+  sensitive   = true
+}
 variable "domeneshop_api_token" {
   description = "The Domeneshop API token"
   type        = string
@@ -39,4 +39,5 @@ variable "github_repository_name" {
 variable "azure_subscription_id" {
   description = "What Azure subscription should the workload identity have access to?"
   type        = string
+  default     = "edbad54f-b52a-4f78-9016-0ac27a6fee55"
 }
