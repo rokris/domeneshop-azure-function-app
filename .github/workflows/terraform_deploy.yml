@@ -68,6 +68,7 @@ jobs:
           echo "TF_VAR_tenant_id=$TF_VAR_tenant_id"
           echo "TF_VAR_domeneshop_api_token=$TF_VAR_domeneshop_api_token"
           echo "TF_VAR_domeneshop_api_secret=[REDACTED]"
+          echo "TF_VAR_terraform_github_token=[REDACTED]"
         env:
           ARM_CLIENT_ID: ${{ env.ARM_CLIENT_ID }}
           ARM_CLIENT_SECRET: ${{ env.ARM_CLIENT_SECRET }}
