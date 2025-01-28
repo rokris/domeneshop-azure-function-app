@@ -91,6 +91,9 @@ This file is used to store environment variables for local development. Below is
 ## **Notes**
 
 - Ensure the **Domeneshop API Token** and **API Secret** are securely stored and not exposed in version control.
-- If running locally, ensure your environment is set up with Python and the required dependencies (`azure-functions`, `requests`, etc.).
+- If running locally, ensure your environment is set up with Python and the required dependencies (`azure-functions`, `httpx`, etc.).
 
+```bash
+pip install -r requirements.txt
+```
 ---
