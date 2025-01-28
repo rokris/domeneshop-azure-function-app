@@ -55,11 +55,20 @@ jobs:
           name: terraform-state
         continue-on-error: true
 
-      # Step 4.3: Ensure Terraform State File Exists
-      - name: Ensure Terraform State File Exists
+      # Step 4.3: Ensure Terraform State File is Valid
+      - name: Ensure Terraform State File is Valid
         run: |
           if [ ! -f ./Terraform/terraform.tfstate ]; then
-            echo "{}" > ./Terraform/terraform.tfstate
+            cat <<EOF > ./Terraform/terraform.tfstate
+            {
+              "version": 4,
+              "terraform_version": "1.10.5",
+              "serial": 0,
+              "lineage": "00000000-0000-0000-0000-000000000000",
+              "outputs": {},
+              "resources": []
+            }
+EOF
           fi
 
       # Step 5: Debug environment variables
