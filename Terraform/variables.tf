@@ -31,8 +31,10 @@ variable "domeneshop_api_secret" {
 variable "github_organization_name" {
   description = "GitHub organization (or user)"
   type        = string
+  default     = "rokris"
 }
 variable "github_repository_name" {
   description = "The GitHub repository to set up workload identity for"
   type        = string
+  default     = "domeneshop-azure-function-app"
 }

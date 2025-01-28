@@ -38,6 +38,12 @@ jobs:
         echo "TF_VAR_subscription_id=$(echo $SP_JSON | jq -r '.subscriptionId')" >> $GITHUB_ENV
         echo "TF_VAR_tenant_id=$(echo $SP_JSON | jq -r '.tenantId')" >> $GITHUB_ENV
 
+    # Step 3.1: Read Domeneshop token and secret into environment variables
+    - name: Read Domeneshop token and secret into environment variables
+      run: |
+        echo "DOMENESHOP_API_TOKEN=${{ secrets.DOMENESHOP_API_TOKEN }}" >> $GITHUB_ENV
+        echo "DOMENESHOP_API_SECRET=${{ secrets.DOMENESHOP_API_SECRET }}" >> $GITHUB_ENV
+
     # Step 4: Debug environment variables
     - name: Debug Environment Variables
       run: |
@@ -45,19 +51,27 @@ jobs:
         echo "ARM_CLIENT_SECRET=[REDACTED]"
         echo "ARM_SUBSCRIPTION_ID=$ARM_SUBSCRIPTION_ID"
         echo "ARM_TENANT_ID=$ARM_TENANT_ID"
+        echo "ARM_DOMAINESHOP_API_TOKEN=$DOMENESHOP_API_TOKEN"
+        echo "ARM_DOMAINESHOP_API_SECRET=[REDACTED]"
         echo "TF_VAR_client_id=$TF_VAR_client_id"
         echo "TF_VAR_client_secret=[REDACTED]"
         echo "TF_VAR_subscription_id=$TF_VAR_subscription_id"
         echo "TF_VAR_tenant_id=$TF_VAR_tenant_id"
+        echo "TF_VAR_domeneshop_api_token=$TF_VAR_domeneshop_api_token"
+        echo "TF_VAR_domeneshop_api_secret=[REDACTED]"
       env:
         ARM_CLIENT_ID: ${{ env.ARM_CLIENT_ID }}
         ARM_CLIENT_SECRET: ${{ env.ARM_CLIENT_SECRET }}
         ARM_SUBSCRIPTION_ID: ${{ env.ARM_SUBSCRIPTION_ID }}
         ARM_TENANT_ID: ${{ env.ARM_TENANT_ID }}
+        ARM_DOMAINESHOP_API_TOKEN: ${{ env.ARM_DOMENESHOP_API_TOKEN }}
+        ARM_DOMAINESHOP_API_SECRET: ${{ env.ARM_DOMENESHOP_API_SECRET }}
         TF_VAR_client_id: ${{ env.TF_VAR_client_id }}
         TF_VAR_client_secret: ${{ env.TF_VAR_client_secret }}
         TF_VAR_subscription_id: ${{ env.TF_VAR_subscription_id }}
         TF_VAR_tenant_id: ${{ env.TF_VAR_tenant_id }}
+        TF_VAR_domeneshop_api_token: ${{ env.TF_VAR_domeneshop_api_token }}
+        TF_VAR_domeneshop_api_secret: ${{ env.TF_VAR_domeneshop_api_secret }}
 
     # Step 5: Initialize Terraform
     - name: Initialize Terraform
@@ -73,6 +87,8 @@ jobs:
         TF_VAR_client_secret: ${{ env.TF_VAR_client_secret }}
         TF_VAR_subscription_id: ${{ env.TF_VAR_subscription_id }}
         TF_VAR_tenant_id: ${{ env.TF_VAR_tenant_id }}
+        TF_VAR_domeneshop_api_token: ${{ env.TF_VAR_domeneshop_api_token }}
+        TF_VAR_domeneshop_api_secret: ${{ env.TF_VAR_domeneshop_api_secret }}
 
     # Step 7: Terraform Apply
     - name: Terraform Apply
@@ -84,3 +100,5 @@ jobs:
         TF_VAR_client_secret: ${{ env.TF_VAR_client_secret }}
         TF_VAR_subscription_id: ${{ env.TF_VAR_subscription_id }}
         TF_VAR_tenant_id: ${{ env.TF_VAR_tenant_id }}
+        TF_VAR_domeneshop_api_token: ${{ env.TF_VAR_domeneshop_api_token }}
+        TF_VAR_domeneshop_api_secret: ${{ env.TF_VAR_domeneshop_api_secret }}
