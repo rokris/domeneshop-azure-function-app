@@ -30,7 +30,6 @@ jobs:
 
       # Step 4: Parse Azure Service Principal JSON
       - name: Parse Azure SP JSON
-        id: parse-sp-json
         run: |
           SP_JSON='${{ secrets.AZURE_SP_JSON }}'
           echo "ARM_CLIENT_ID=$(echo $SP_JSON | jq -r '.clientId')" >> $GITHUB_ENV
@@ -59,16 +58,14 @@ jobs:
       - name: Ensure Terraform State File is Valid
         run: |
           if [ ! -f ./Terraform/terraform.tfstate ]; then
-            cat <<EOF > ./Terraform/terraform.tfstate
-            {
+            echo '{
               "version": 4,
               "terraform_version": "1.10.5",
               "serial": 0,
               "lineage": "00000000-0000-0000-0000-000000000000",
               "outputs": {},
               "resources": []
-            }
-EOF
+            }' > ./Terraform/terraform.tfstate
           fi
 
       # Step 5: Debug environment variables
@@ -132,7 +129,7 @@ EOF
 
       # Step 9: Upload Terraform State
       - name: Upload Terraform State
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: terraform-state
           path: ./Terraform/terraform.tfstate
