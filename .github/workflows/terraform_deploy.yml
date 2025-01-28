@@ -18,12 +18,18 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Step 2: Initialize Terraform
+      # Step 2: Set up Terraform
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.10.5
+
+      # Step 3: Initialize Terraform
       - name: Initialize Terraform
         run: terraform init
         working-directory: ./Terraform
 
-      # Step 3: Terraform Plan
+      # Step 4: Terraform Plan
       - name: Terraform Plan
         run: terraform plan -out=tfplan
         working-directory: ./Terraform
@@ -35,7 +41,7 @@ jobs:
           TF_VAR_domeneshop_api_token: ${{ secrets.DOMENESHOP_API_TOKEN }}
           TF_VAR_domeneshop_api_secret: ${{ secrets.DOMENESHOP_API_SECRET }}
 
-      # Step 4: Save .terraform directory and tfplan as artifacts
+      # Step 5: Save .terraform directory and tfplan as artifacts
       - name: Upload Terraform Artifacts
         uses: actions/upload-artifact@v3
         with:
@@ -55,18 +61,32 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Step 2: Download Terraform Artifacts
+      # Step 2: Set up Terraform
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.10.5
+
+      # Step 3: Download Terraform Artifacts
       - name: Download Terraform Artifacts
         uses: actions/download-artifact@v3
         with:
           name: terraform-artifacts
 
-      # Step 3: Initialize Terraform
+      # Step 4: Initialize Terraform
       - name: Initialize Terraform
         run: terraform init
         working-directory: ./Terraform
 
-      # Step 4: Terraform Apply
+      # Step 5: Check auto_apply input
+      - name: Check Auto Apply
+        run: |
+          if [ "${{ github.event.inputs.auto_apply }}" == "false" ]; then
+            echo "Auto apply is disabled. Please approve the workflow to continue."
+            exit 0
+          fi
+
+      # Step 6: Terraform Apply
       - name: Terraform Apply
         run: terraform apply -auto-approve tfplan
         working-directory: ./Terraform
