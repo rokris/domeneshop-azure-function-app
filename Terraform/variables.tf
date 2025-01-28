@@ -36,7 +36,3 @@ variable "github_repository_name" {
   description = "The GitHub repository to set up workload identity for"
   type        = string
 }
-variable "azure_subscription_id" {
-  description = "What Azure subscription should the workload identity have access to?"
-  type        = string
-}

@@ -17,7 +17,7 @@ terraform {
 provider "azurerm" {
   features {}
 
-  subscription_id = var.azure_subscription_id
+  subscription_id = var.subscription_id
   client_id       = var.client_id
   client_secret   = var.client_secret
   tenant_id       = var.tenant_id
@@ -72,7 +72,7 @@ resource "github_actions_secret" "azure_tenant_id" {
 resource "github_actions_secret" "azure_subscription_id" {
   repository      = data.github_repository.this.name
   secret_name     = "AZUREAPPSERVICE_SUBSCRIPTIONID"
-  plaintext_value = var.azure_subscription_id 
+  plaintext_value = var.subscription_id
 }
 
 resource "azurerm_storage_account" "sa" {
