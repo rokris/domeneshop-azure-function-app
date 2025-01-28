@@ -18,46 +18,32 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Step 2: Set up Terraform
-      - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v2
-        with:
-          terraform_version: 1.10.5
-
-      # Step 3: Parse Azure SP JSON
-      - name: Parse Azure SP JSON
-        run: |
-          SP_JSON='${{ secrets.AZURE_SP_JSON }}'
-          echo "TF_VAR_client_id=$(echo $SP_JSON | jq -r '.clientId')" >> $GITHUB_ENV
-          echo "TF_VAR_client_secret=$(echo $SP_JSON | jq -r '.clientSecret')" >> $GITHUB_ENV
-          echo "TF_VAR_subscription_id=$(echo $SP_JSON | jq -r '.subscriptionId')" >> $GITHUB_ENV
-          echo "TF_VAR_tenant_id=$(echo $SP_JSON | jq -r '.tenantId')" >> $GITHUB_ENV
-          echo "TF_VAR_domeneshop_api_token=${{ secrets.DOMENESHOP_API_TOKEN }}" >> $GITHUB_ENV
-          echo "TF_VAR_domeneshop_api_secret=${{ secrets.DOMENESHOP_API_SECRET }}" >> $GITHUB_ENV
-
-      # Step 4: Initialize Terraform
+      # Step 2: Initialize Terraform
       - name: Initialize Terraform
         run: terraform init
         working-directory: ./Terraform
 
-      # Step 5: Terraform Plan
+      # Step 3: Terraform Plan
       - name: Terraform Plan
         run: terraform plan -out=tfplan
         working-directory: ./Terraform
         env:
-          TF_VAR_client_id: ${{ env.TF_VAR_client_id }}
-          TF_VAR_client_secret: ${{ env.TF_VAR_client_secret }}
-          TF_VAR_subscription_id: ${{ env.TF_VAR_subscription_id }}
-          TF_VAR_tenant_id: ${{ env.TF_VAR_tenant_id }}
-          TF_VAR_domeneshop_api_token: ${{ env.TF_VAR_domeneshop_api_token }}
-          TF_VAR_domeneshop_api_secret: ${{ env.TF_VAR_domeneshop_api_secret }}
+          TF_VAR_client_id: ${{ secrets.AZURE_CLIENT_ID }}
+          TF_VAR_client_secret: ${{ secrets.AZURE_CLIENT_SECRET }}
+          TF_VAR_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          TF_VAR_tenant_id: ${{ secrets.AZURE_TENANT_ID }}
+          TF_VAR_domeneshop_api_token: ${{ secrets.DOMENESHOP_API_TOKEN }}
+          TF_VAR_domeneshop_api_secret: ${{ secrets.DOMENESHOP_API_SECRET }}
 
-      # Step 6: Upload tfplan as an artifact
-      - name: Upload tfplan
+      # Step 4: Save .terraform directory and tfplan as artifacts
+      - name: Upload Terraform Artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: tfplan
-          path: ./Terraform/tfplan
+          name: terraform-artifacts
+          path: |
+            ./Terraform/tfplan
+            ./Terraform/.terraform
+            ./Terraform/.terraform.lock.hcl
 
   terraform-apply:
     name: Terraform Apply
@@ -69,38 +55,25 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Step 2: Download tfplan artifact
-      - name: Download tfplan
+      # Step 2: Download Terraform Artifacts
+      - name: Download Terraform Artifacts
         uses: actions/download-artifact@v3
         with:
-          name: tfplan
-          path: ./Terraform
+          name: terraform-artifacts
 
-      # Step 3: Set up Terraform
-      - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v2
-        with:
-          terraform_version: 1.10.5
+      # Step 3: Initialize Terraform
+      - name: Initialize Terraform
+        run: terraform init
+        working-directory: ./Terraform
 
-      # Step 4: Parse Azure SP JSON (again, to load the variables)
-      - name: Parse Azure SP JSON
-        run: |
-          SP_JSON='${{ secrets.AZURE_SP_JSON }}'
-          echo "TF_VAR_client_id=$(echo $SP_JSON | jq -r '.clientId')" >> $GITHUB_ENV
-          echo "TF_VAR_client_secret=$(echo $SP_JSON | jq -r '.clientSecret')" >> $GITHUB_ENV
-          echo "TF_VAR_subscription_id=$(echo $SP_JSON | jq -r '.subscriptionId')" >> $GITHUB_ENV
-          echo "TF_VAR_tenant_id=$(echo $SP_JSON | jq -r '.tenantId')" >> $GITHUB_ENV
-          echo "TF_VAR_domeneshop_api_token=${{ secrets.DOMENESHOP_API_TOKEN }}" >> $GITHUB_ENV
-          echo "TF_VAR_domeneshop_api_secret=${{ secrets.DOMENESHOP_API_SECRET }}" >> $GITHUB_ENV
-
-      # Step 5: Terraform Apply
+      # Step 4: Terraform Apply
       - name: Terraform Apply
         run: terraform apply -auto-approve tfplan
         working-directory: ./Terraform
         env:
-          TF_VAR_client_id: ${{ env.TF_VAR_client_id }}
-          TF_VAR_client_secret: ${{ env.TF_VAR_client_secret }}
-          TF_VAR_subscription_id: ${{ env.TF_VAR_subscription_id }}
-          TF_VAR_tenant_id: ${{ env.TF_VAR_tenant_id }}
-          TF_VAR_domeneshop_api_token: ${{ env.TF_VAR_domeneshop_api_token }}
-          TF_VAR_domeneshop_api_secret: ${{ env.TF_VAR_domeneshop_api_secret }}
+          TF_VAR_client_id: ${{ secrets.AZURE_CLIENT_ID }}
+          TF_VAR_client_secret: ${{ secrets.AZURE_CLIENT_SECRET }}
+          TF_VAR_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          TF_VAR_tenant_id: ${{ secrets.AZURE_TENANT_ID }}
+          TF_VAR_domeneshop_api_token: ${{ secrets.DOMENESHOP_API_TOKEN }}
+          TF_VAR_domeneshop_api_secret: ${{ secrets.DOMENESHOP_API_SECRET }}
