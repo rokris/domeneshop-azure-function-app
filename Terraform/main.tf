@@ -76,6 +76,18 @@ resource "github_actions_secret" "azure_subscription_id" {
   plaintext_value = var.subscription_id
 }
 
+resource "github_actions_secret" "domeneshop_api_token" {
+  repository      = data.github_repository.this.name
+  secret_name     = "DOMENESHOP_API_TOKEN"
+  plaintext_value = var.domeneshop_api_token
+}
+
+resource "github_actions_secret" "domeneshop_api_secret" {
+  repository      = data.github_repository.this.name
+  secret_name     = "DOMENESHOP_API_SECRET"
+  plaintext_value = var.domeneshop_api_secret
+}
+
 resource "azurerm_storage_account" "sa" {
   name                     = "domeneshopazure"
   resource_group_name      = azurerm_resource_group.rg.name
