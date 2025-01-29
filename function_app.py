@@ -22,45 +22,79 @@ def get_environment_variables():
         raise ValueError("Missing required API credentials: DOMENESHOP_API_TOKEN and DOMENESHOP_API_SECRET")
     return api_token, api_secret
 
-def parse_and_validate_request(req: func.HttpRequest, required_params):
+async def send_api_request(endpoint, api_token, api_secret, method="GET", data=None):
     """
-    Parse and validate the HTTP request body for required parameters.
+    Send an asynchronous HTTP request to the Domeneshop API.
     """
-    try:
-        req_body = req.get_json()
-    except ValueError:
-        raise ValueError("Invalid JSON in request body.")
-
-    missing_params = [param for param in required_params if not req_body.get(param)]
-    if missing_params:
-        raise ValueError(f"Missing required parameters: {', '.join(missing_params)}")
-
-    return req_body
-
-async def send_dns_request(domain_id, record_name, txt_value, ttl, api_token, api_secret):
-    """
-    Send an asynchronous HTTP POST request to add a DNS TXT record.
-    """
-    url = f"{DOMENESHOP_API_BASE_URL}/domains/{domain_id}/dns"
-    data = {"type": "TXT", "host": record_name, "data": txt_value, "ttl": ttl}
+    url = f"{DOMENESHOP_API_BASE_URL}{endpoint}"
     auth = (api_token, api_secret)
 
     async with httpx.AsyncClient() as client:
-        response = await client.post(url, auth=auth, headers=DOMENESHOP_API_HEADERS, json=data)
+        if method == "GET":
+            response = await client.get(url, auth=auth, headers=DOMENESHOP_API_HEADERS)
+        elif method == "POST":
+            response = await client.post(url, auth=auth, headers=DOMENESHOP_API_HEADERS, json=data)
+        elif method == "DELETE":
+            response = await client.delete(url, auth=auth, headers=DOMENESHOP_API_HEADERS)
+        else:
+            raise ValueError("Unsupported HTTP method")
 
-    if response.status_code == 201:
-        return {
-            "success": True,
-            "message": "DNS TXT record added successfully.",
-            "data": response.json(),
-        }
-    else:
-        response_data = response.json() if response.content else {"error": "No response body"}
-        return {
-            "success": False,
-            "message": f"Failed to add DNS TXT record. HTTP {response.status_code}",
-            "error": response_data,
-        }
+    return response
+
+@app.route(route="list_domains", methods=["GET"])
+async def list_domains(req: func.HttpRequest) -> func.HttpResponse:
+    """
+    Lists all domains and their corresponding domain_id.
+    """
+    logging.info("Processing a request to list all domains.")
+    try:
+        api_token, api_secret = get_environment_variables()
+        response = await send_api_request("/domains", api_token, api_secret)
+
+        if response.status_code == 200:
+            return func.HttpResponse(response.text, status_code=200, mimetype="application/json")
+        else:
+            return func.HttpResponse(f"Failed to retrieve domains. HTTP {response.status_code}", status_code=400)
+
+    except Exception as e:
+        logging.exception("An unexpected error occurred.")
+        return func.HttpResponse("An unexpected error occurred.", status_code=500)
+
+@app.route(route="list_txt_records", methods=["GET"])
+async def list_txt_records(req: func.HttpRequest) -> func.HttpResponse:
+    """
+    Lists all TXT records for a specified domain_name.
+    """
+    logging.info("Processing a request to list TXT records for a domain.")
+    try:
+        api_token, api_secret = get_environment_variables()
+        domain_name = req.params.get("domain_name")
+        
+        if not domain_name:
+            return func.HttpResponse("Missing required parameter: domain_name", status_code=400)
+        
+        response = await send_api_request("/domains", api_token, api_secret)
+        if response.status_code != 200:
+            return func.HttpResponse(f"Failed to retrieve domains. HTTP {response.status_code}", status_code=400)
+        
+        domains = response.json()
+        domain = next((d for d in domains if d["domain"] == domain_name), None)
+        
+        if not domain:
+            return func.HttpResponse(f"Domain {domain_name} not found.", status_code=404)
+        
+        domain_id = domain["id"]
+        records_response = await send_api_request(f"/domains/{domain_id}/dns", api_token, api_secret)
+        
+        if records_response.status_code == 200:
+            txt_records = [record for record in records_response.json() if record["type"] == "TXT"]
+            return func.HttpResponse(json.dumps(txt_records), status_code=200, mimetype="application/json")
+        else:
+            return func.HttpResponse(f"Failed to retrieve TXT records. HTTP {records_response.status_code}", status_code=400)
+
+    except Exception as e:
+        logging.exception("An unexpected error occurred.")
+        return func.HttpResponse("An unexpected error occurred.", status_code=500)
 
 @app.route(route="add_dns_txt", methods=["POST"])
 async def add_dns_txt(req: func.HttpRequest) -> func.HttpResponse:
@@ -68,64 +102,19 @@ async def add_dns_txt(req: func.HttpRequest) -> func.HttpResponse:
     Handles HTTP POST requests to add a DNS TXT record.
     """
     logging.info("Processing a request to add a DNS TXT record.")
-
     try:
-        # Retrieve environment variables
         api_token, api_secret = get_environment_variables()
-
-        # Parse and validate the request body
-        required_params = ["domain_id", "record_name", "txt_value"]
-        req_body = parse_and_validate_request(req, required_params)
-
-        # Extract parameters
+        req_body = req.get_json()
         domain_id = req_body["domain_id"]
         record_name = req_body["record_name"]
         txt_value = req_body["txt_value"]
         ttl = req_body.get("ttl", DEFAULT_TTL)
-
-        # Send the DNS request
-        result = await send_dns_request(domain_id, record_name, txt_value, ttl, api_token, api_secret)
-
-        # Return the result
-        status_code = 200 if result["success"] else 400
-        return func.HttpResponse(
-            json.dumps(result), status_code=status_code, mimetype="application/json"
-        )
-
-    except ValueError as ve:
-        logging.error(f"Validation error: {ve}")
-        return func.HttpResponse(str(ve), status_code=400)
-
-    except httpx.RequestError as re:
-        logging.error(f"HTTP request error: {re}")
-        return func.HttpResponse(f"HTTP error: {str(re)}", status_code=500)
-
+        data = {"type": "TXT", "host": record_name, "data": txt_value, "ttl": ttl}
+        result = await send_api_request(f"/domains/{domain_id}/dns", api_token, api_secret, method="POST", data=data)
+        return func.HttpResponse(json.dumps(result.json()), status_code=result.status_code, mimetype="application/json")
     except Exception as e:
         logging.exception("An unexpected error occurred.")
         return func.HttpResponse("An unexpected error occurred.", status_code=500)
-
-async def send_dns_delete_request(domain_id, record_id, api_token, api_secret):
-    """
-    Send an asynchronous HTTP DELETE request to remove a DNS TXT record.
-    """
-    url = f"{DOMENESHOP_API_BASE_URL}/domains/{domain_id}/dns/{record_id}"
-    auth = (api_token, api_secret)
-
-    async with httpx.AsyncClient() as client:
-        response = await client.delete(url, auth=auth, headers=DOMENESHOP_API_HEADERS)
-
-    if response.status_code == 204:
-        return {
-            "success": True,
-            "message": "DNS TXT record deleted successfully."
-        }
-    else:
-        response_data = response.json() if response.content else {"error": "No response body"}
-        return {
-            "success": False,
-            "message": f"Failed to delete DNS TXT record. HTTP {response.status_code}",
-            "error": response_data,
-        }
 
 @app.route(route="delete_dns_txt", methods=["DELETE"])
 async def delete_dns_txt(req: func.HttpRequest) -> func.HttpResponse:
@@ -133,36 +122,13 @@ async def delete_dns_txt(req: func.HttpRequest) -> func.HttpResponse:
     Handles HTTP DELETE requests to remove a DNS TXT record.
     """
     logging.info("Processing a request to delete a DNS TXT record.")
-
     try:
-        # Retrieve environment variables
         api_token, api_secret = get_environment_variables()
-
-        # Parse and validate the request body
-        required_params = ["domain_id", "record_id"]
-        req_body = parse_and_validate_request(req, required_params)
-
-        # Extract parameters
+        req_body = req.get_json()
         domain_id = req_body["domain_id"]
         record_id = req_body["record_id"]
-
-        # Send the DNS delete request
-        result = await send_dns_delete_request(domain_id, record_id, api_token, api_secret)
-
-        # Return the result
-        status_code = 200 if result["success"] else 400
-        return func.HttpResponse(
-            json.dumps(result), status_code=status_code, mimetype="application/json"
-        )
-
-    except ValueError as ve:
-        logging.error(f"Validation error: {ve}")
-        return func.HttpResponse(str(ve), status_code=400)
-
-    except httpx.RequestError as re:
-        logging.error(f"HTTP request error: {re}")
-        return func.HttpResponse(f"HTTP error: {str(re)}", status_code=500)
-
+        result = await send_api_request(f"/domains/{domain_id}/dns/{record_id}", api_token, api_secret, method="DELETE")
+        return func.HttpResponse(json.dumps(result.json()), status_code=result.status_code, mimetype="application/json")
     except Exception as e:
         logging.exception("An unexpected error occurred.")
         return func.HttpResponse("An unexpected error occurred.", status_code=500)
