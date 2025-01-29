@@ -128,7 +128,11 @@ async def delete_dns_txt(req: func.HttpRequest) -> func.HttpResponse:
         domain_id = req_body["domain_id"]
         record_id = req_body["record_id"]
         result = await send_api_request(f"/domains/{domain_id}/dns/{record_id}", api_token, api_secret, method="DELETE")
-        return func.HttpResponse(json.dumps(result.json()), status_code=result.status_code, mimetype="application/json")
+        
+        if result.status_code == 204:
+            return func.HttpResponse(json.dumps({"success": True, "message": "DNS TXT record deleted successfully."}), status_code=200, mimetype="application/json")
+        else:
+            return func.HttpResponse(json.dumps({"success": False, "message": f"Failed to delete DNS TXT record. HTTP {result.status_code}", "error": result.text}), status_code=400, mimetype="application/json")
     except Exception as e:
         logging.exception("An unexpected error occurred.")
         return func.HttpResponse("An unexpected error occurred.", status_code=500)
