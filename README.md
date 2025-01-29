@@ -35,7 +35,7 @@ az role assignment create \
 You can interact with the Azure Function using **HTTPie**. Below is an example of how to make a request to add a DNS TXT record:
 
 ```bash
-http POST https://<FUNCTION_APP_NAME>.azurewebsites.net/api/<FUNCTION_NAME> \
+http POST https://<FUNCTION_APP_NAME>.azurewebsites.net/api/add_dns_txt \
     x-functions-key:xxxxxxxxxxxxxxxxxxxxxxxxx \
     Content-Type:application/json \
     domain_id= \
@@ -45,17 +45,26 @@ http POST https://<FUNCTION_APP_NAME>.azurewebsites.net/api/<FUNCTION_NAME> \
 ```
 
 ```bash
-http DELETE https://<FUNCTION_APP_NAME>.azurewebsites.net/api/<FUNCTION_NAME> \
+http DELETE https://<FUNCTION_APP_NAME>.azurewebsites.net/api/delete_dns_txt \
      x-functions-key:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx \
      Content-Type:application/json \
      domain_id= \
      record_id=
 ```
 
+```bash
+http GET https://<FUNCTION_APP_NAME>.azurewebsites.net/api/list_domains \
+     x-functions-key:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx \
+```
+
+```bash
+http GET https://<FUNCTION_APP_NAME>.azurewebsites.net/api/list_txt_records?domain_name=stoppe.no \
+     x-functions-key:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx \
+```
+
 Replace the following:
 
 - `<FUNCTION_APP_NAME>`: The name of your Azure Function App.
-- `<FUNCTION_NAME>`: The name of your Azure Function.
 - `xxxxxxxxxxxxxxxxxxxxxxxxx`: The Function Key for authentication.
 - Update `domain_id`, `record_id`, record_name`, and `txt_value` with your actual values.
 
