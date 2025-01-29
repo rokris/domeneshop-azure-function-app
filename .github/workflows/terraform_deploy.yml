@@ -24,11 +24,11 @@ jobs:
         with:
           terraform_version: 1.10.5
 
-      # Step 3: Set GitHub Token for Managing Secrets (Fixed ShellCheck SC2086)
+      # Step 3: Set GitHub Token for Managing Secrets (Fixed SC2086)
       - name: Set GitHub Token
         run: echo "TF_VAR_terraform_github_token=${{ secrets.TERRAFORM_GITHUB_TOKEN }}" >> "$GITHUB_ENV"
 
-      # Step 4: Parse Azure Service Principal JSON (Fixed ShellCheck SC2086 and SC2129)
+      # Step 4: Parse Azure Service Principal JSON (Fixed SC2086 & SC2129)
       - name: Parse Azure SP JSON
         run: |
           SP_JSON="${{ secrets.AZURE_SP_JSON }}"
@@ -69,9 +69,9 @@ jobs:
           TF_VAR_domeneshop_api_secret: "${{ env.TF_VAR_domeneshop_api_secret }}"
           TF_VAR_terraform_github_token: "${{ env.TF_VAR_terraform_github_token }}"
 
-      # Step 8: Terraform Apply
+      # Step 8: Terraform Apply (Fixed auto_apply condition)
       - name: Terraform Apply
-        if: github.event.inputs.auto_apply == 'true' || github.event.inputs.auto_apply == true
+        if: ${{ github.event.inputs.auto_apply == 'true' || github.event.inputs.auto_apply == true }}
         run: terraform apply -auto-approve tfplan
         working-directory: ./Terraform
         env:
