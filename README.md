@@ -23,7 +23,7 @@ az role assignment create \
 ```
 
 - Create GitHub Personal access tokens (classic) ( repo, workflow, admin:repo_hook ? )
-  * Store tokens in Github Secrets under name TERRAFORM_GITHUB_TOKEN 
+  * Store tokens in Github Secrets under name TERRAFORM_GITHUB_TOKEN
 - Run the workflow "Terraform Azure Deployment" to create the Azure resources (Run the workflow only once).
   * Parameter = false, will abort running after the planning step.
 - Run GitHub workflow
