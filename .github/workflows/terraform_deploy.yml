@@ -45,7 +45,7 @@ jobs:
       - name: Read Domeneshop token and secret into environment variables
         run: |
           echo "TF_VAR_domeneshop_api_token=${{ secrets.DOMENESHOP_API_TOKEN }}" >> $GITHUB_ENV
-          echo "TF_VAR_domeneshop_api_token=${{ secrets.DOMENESHOP_API_SECRET }}" >> $GITHUB_ENV
+          echo "TF_VAR_domeneshop_api_secret=${{ secrets.DOMENESHOP_API_SECRET }}" >> $GITHUB_ENV
 
       # Step 6: Initialize Terraform
       - name: Initialize Terraform
