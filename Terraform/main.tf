@@ -49,8 +49,8 @@ resource "azurerm_federated_identity_credential" "fc" {
   name                = "rokris-domeneshop-azure-function-app"
   parent_id           = azurerm_user_assigned_identity.base.id
   resource_group_name = azurerm_resource_group.rg.name
-  audience            = ["api://AzureADTokenExchange"] # Common audience for OIDC
-  issuer              = "https://token.actions.githubusercontent.com" # Replace with your identity provider's issuer
+  audience            = ["api://AzureADTokenExchange"]                                    # Common audience for OIDC
+  issuer              = "https://token.actions.githubusercontent.com"                     # Replace with your identity
   subject             = "repo:rokris/domeneshop-azure-function-app:ref:refs/heads/master" # Replace with your specific repo and branch
 }
 
