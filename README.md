@@ -5,13 +5,13 @@ This Azure Function enables the addition of DNS TXT records to the Domeneshop DN
 
 ---
 
-## **Prereq**
+## **Prerequisites**
 
-- Fork or Clone the GitHub repository to your own repository
-- Create DOMENESHOP_API_TOKEN and DOMENESHOP_API_SECRET at Domeneshop website
-  * Store token and secret in Github Actions secrets and variables
-- Create a Azure Service Principal
-  * Store the JSON in Github secrets under AZURE_SP_JSON
+- Fork or clone the GitHub repository.
+- Create **DOMENESHOP_API_TOKEN** and **DOMENESHOP_API_SECRET** on the Domeneshop website.
+  - Store the token and secret in **GitHub Actions secrets** and variables.
+- Create an **Azure Service Principal**.
+  - Store the JSON in GitHub secrets under `AZURE_SP_JSON`.
 
 ```bash
 az ad sp create-for-rbac --name <name> --role Contributor --scopes /subscriptions/<Subscription-ID> --json-auth
@@ -19,55 +19,58 @@ az ad sp create-for-rbac --name <name> --role Contributor --scopes /subscription
 az role assignment create \
   --assignee <Application ID> \
   --role "User Access Administrator" \
-  --scope /subscriptions/<Subscription ID>
+  --scope /subscriptions/<Subscription-ID>
 ```
 
-- Create GitHub Personal access tokens (classic) ( repo, workflow, admin:repo_hook ? )
-  * Store tokens in Github Secrets under name TERRAFORM_GITHUB_TOKEN
-- Run the workflow "Terraform Azure Deployment" to create the Azure resources (Run the workflow only once).
-  * Parameter = false, will abort running after the planning step.
-- Run GitHub workflow
-  * Build and deploy Python project to Azure Function App - domeneshop-azure-function-app
+- Create **GitHub Personal Access Tokens (Classic)** with the required permissions (`repo`, `workflow`, `admin:repo_hook`).
+  - Store the token in **GitHub Secrets** under `TERRAFORM_GITHUB_TOKEN`.
+- Run the workflow **"Terraform Azure Deployment"** to create the Azure resources (**Run this workflow only once**).
+  - If the parameter is set to `false`, execution will stop after the planning step.
+- Run the GitHub workflow to:
+  - **Build and deploy** the Python project to **Azure Function App** - `<YOUR_FUNCTION_APP_NAME>`.
 
 ---
 
 ## **Usage Example with HTTPie**
 
-You can interact with the Azure Function using **HTTPie**. Below is an example of how to make a request to add a DNS TXT record:
+You can interact with the Azure Function using **HTTPie**. Below are examples of how to make requests:
 
+### **Add a DNS TXT Record**
 ```bash
-http POST https://<FUNCTION_APP_NAME>.azurewebsites.net/api/add_dns_txt \
-    x-functions-key:xxxxxxxxxxxxxxxxxxxxxxxxx \
+http POST https://<YOUR_FUNCTION_APP_NAME>.azurewebsites.net/api/add_dns_txt \
+    x-functions-key:<YOUR_FUNCTION_KEY> \
     Content-Type:application/json \
-    domain_id= \
-    record_name="" \
-    txt_value="" \
-    ttl:=3600 --> optional
+    domain_id=<YOUR_DOMAIN_ID> \
+    record_name="<YOUR_RECORD_NAME>" \
+    txt_value="<YOUR_TXT_VALUE>" \
+    ttl:=3600  # Optional
 ```
 
+### **Delete a DNS TXT Record**
 ```bash
-http DELETE https://<FUNCTION_APP_NAME>.azurewebsites.net/api/delete_dns_txt \
-     x-functions-key:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx \
-     Content-Type:application/json \
-     domain_id= \
-     record_id=
+http DELETE https://<YOUR_FUNCTION_APP_NAME>.azurewebsites.net/api/delete_dns_txt \
+    x-functions-key:<YOUR_FUNCTION_KEY> \
+    Content-Type:application/json \
+    domain_id=<YOUR_DOMAIN_ID> \
+    record_id=<YOUR_RECORD_ID>
 ```
 
+### **List Domains**
 ```bash
-http GET https://<FUNCTION_APP_NAME>.azurewebsites.net/api/list_domains \
-     x-functions-key:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx \
+http GET https://<YOUR_FUNCTION_APP_NAME>.azurewebsites.net/api/list_domains \
+    x-functions-key:<YOUR_FUNCTION_KEY>
 ```
 
+### **List TXT Records for a Domain**
 ```bash
-http GET https://<FUNCTION_APP_NAME>.azurewebsites.net/api/list_txt_records?domain_name=stoppe.no \
-     x-functions-key:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx \
+http GET "https://<YOUR_FUNCTION_APP_NAME>.azurewebsites.net/api/list_txt_records?domain_name=example.com" \
+    x-functions-key:<YOUR_FUNCTION_KEY>
 ```
 
-Replace the following:
-
-- `<FUNCTION_APP_NAME>`: The name of your Azure Function App.
-- `xxxxxxxxxxxxxxxxxxxxxxxxx`: The Function Key for authentication.
-- Update `domain_id`, `record_id`, record_name`, and `txt_value` with your actual values.
+### **Replace the Following Placeholders:**
+- `<YOUR_FUNCTION_APP_NAME>`: Your **Azure Function App** name.
+- `<YOUR_FUNCTION_KEY>`: The **Function Key** for authentication.
+- `<YOUR_DOMAIN_ID>`, `<YOUR_RECORD_ID>`, `<YOUR_RECORD_NAME>`, and `<YOUR_TXT_VALUE>` with your **actual values**.
 
 ---
 
@@ -75,9 +78,8 @@ Replace the following:
 
 To test this function locally, create the following file in the root of your project:
 
-### `local.settings.json`
-
-This file is used to store environment variables for local development. Below is an example:
+### **`local.settings.json`**
+This file stores environment variables for local development.
 
 ```json
 {
@@ -85,8 +87,8 @@ This file is used to store environment variables for local development. Below is
   "Values": {
     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
     "FUNCTIONS_WORKER_RUNTIME": "python",
-    "DOMENESHOP_API_TOKEN": "xxxxxxxxxxxxxxxx",
-    "DOMENESHOP_API_SECRET": "xxxxxxxxxxxxxxxxxxxxxxx",
+    "DOMENESHOP_API_TOKEN": "your_api_token",
+    "DOMENESHOP_API_SECRET": "your_api_secret",
     "WEBSITES_ENABLE_APP_SERVICE_STORAGE": false
   },
   "Host": {
@@ -96,14 +98,13 @@ This file is used to store environment variables for local development. Below is
   }
 }
 ```
+
 ---
 
 ## **Notes**
-
-- Ensure the **Domeneshop API Token** and **API Secret** are securely stored and not exposed in version control.
-- If running locally, ensure your environment is set up with Python and the required dependencies (`azure-functions`, `httpx`, etc.).
+- Ensure that **Domeneshop API Token** and **API Secret** are securely stored and **not exposed in version control**.
+- If running locally, ensure your environment is set up with Python and the required dependencies:
 
 ```bash
 pip install -r requirements.txt
 ```
----
