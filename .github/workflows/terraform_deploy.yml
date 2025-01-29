@@ -31,17 +31,15 @@ jobs:
       # Step 4: Parse Azure Service Principal JSON (Fixed SC2086 & SC2129)
       - name: Parse Azure SP JSON
         run: |
-          SP_JSON="${{ secrets.AZURE_SP_JSON }}"
-          {
-            echo "ARM_CLIENT_ID=$(echo "$SP_JSON" | jq -r '.clientId')"
-            echo "ARM_CLIENT_SECRET=$(echo "$SP_JSON" | jq -r '.clientSecret')"
-            echo "ARM_SUBSCRIPTION_ID=$(echo "$SP_JSON" | jq -r '.subscriptionId')"
-            echo "ARM_TENANT_ID=$(echo "$SP_JSON" | jq -r '.tenantId')"
-            echo "TF_VAR_client_id=$(echo "$SP_JSON" | jq -r '.clientId')"
-            echo "TF_VAR_client_secret=$(echo "$SP_JSON" | jq -r '.clientSecret')"
-            echo "TF_VAR_subscription_id=$(echo "$SP_JSON" | jq -r '.subscriptionId')"
-            echo "TF_VAR_tenant_id=$(echo "$SP_JSON" | jq -r '.tenantId')"
-          } >> "$GITHUB_ENV"
+          SP_JSON='${{ secrets.AZURE_SP_JSON }}'
+          echo "ARM_CLIENT_ID=$(echo $SP_JSON | jq -r '.clientId')" >> $GITHUB_ENV
+          echo "ARM_CLIENT_SECRET=$(echo $SP_JSON | jq -r '.clientSecret')" >> $GITHUB_ENV
+          echo "ARM_SUBSCRIPTION_ID=$(echo $SP_JSON | jq -r '.subscriptionId')" >> $GITHUB_ENV
+          echo "ARM_TENANT_ID=$(echo $SP_JSON | jq -r '.tenantId')" >> $GITHUB_ENV
+          echo "TF_VAR_client_id=$(echo $SP_JSON | jq -r '.clientId')" >> $GITHUB_ENV
+          echo "TF_VAR_client_secret=$(echo $SP_JSON | jq -r '.clientSecret')" >> $GITHUB_ENV
+          echo "TF_VAR_subscription_id=$(echo $SP_JSON | jq -r '.subscriptionId')" >> $GITHUB_ENV
+          echo "TF_VAR_tenant_id=$(echo $SP_JSON | jq -r '.tenantId')" >> $GITHUB_ENV
 
       # Step 5: Read Domeneshop token and secret into environment variables (Fixed SC2086)
       - name: Read Domeneshop token and secret into environment variables
