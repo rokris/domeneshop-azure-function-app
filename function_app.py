@@ -55,7 +55,6 @@ async def list_domains(req: func.HttpRequest) -> func.HttpResponse:
             return func.HttpResponse(response.text, status_code=200, mimetype="application/json")
         else:
             return func.HttpResponse(f"Failed to retrieve domains. HTTP {response.status_code}", status_code=400)
-
     except Exception as e:
         logging.exception("An unexpected error occurred.")
         return func.HttpResponse("An unexpected error occurred.", status_code=500)
@@ -91,7 +90,6 @@ async def list_txt_records(req: func.HttpRequest) -> func.HttpResponse:
             return func.HttpResponse(json.dumps(txt_records), status_code=200, mimetype="application/json")
         else:
             return func.HttpResponse(f"Failed to retrieve TXT records. HTTP {records_response.status_code}", status_code=400)
-
     except Exception as e:
         logging.exception("An unexpected error occurred.")
         return func.HttpResponse("An unexpected error occurred.", status_code=500)
@@ -105,12 +103,25 @@ async def add_dns_txt(req: func.HttpRequest) -> func.HttpResponse:
     try:
         api_token, api_secret = get_environment_variables()
         req_body = req.get_json()
-        domain_id = req_body["domain_id"]
+        domain_name = req_body["domain_name"]
         record_name = req_body["record_name"]
         txt_value = req_body["txt_value"]
         ttl = req_body.get("ttl", DEFAULT_TTL)
+        
+        response = await send_api_request("/domains", api_token, api_secret)
+        if response.status_code != 200:
+            return func.HttpResponse(f"Failed to retrieve domains. HTTP {response.status_code}", status_code=400)
+        
+        domains = response.json()
+        domain = next((d for d in domains if d["domain"] == domain_name), None)
+        
+        if not domain:
+            return func.HttpResponse(f"Domain {domain_name} not found.", status_code=404)
+        
+        domain_id = domain["id"]
         data = {"type": "TXT", "host": record_name, "data": txt_value, "ttl": ttl}
         result = await send_api_request(f"/domains/{domain_id}/dns", api_token, api_secret, method="POST", data=data)
+        
         return func.HttpResponse(json.dumps(result.json()), status_code=result.status_code, mimetype="application/json")
     except Exception as e:
         logging.exception("An unexpected error occurred.")
@@ -119,16 +130,29 @@ async def add_dns_txt(req: func.HttpRequest) -> func.HttpResponse:
 @app.route(route="delete_dns_txt", methods=["DELETE"])
 async def delete_dns_txt(req: func.HttpRequest) -> func.HttpResponse:
     """
-    Handles HTTP DELETE requests to remove a DNS TXT record.
+    Handles HTTP DELETE requests to remove a DNS TXT record using domain_name instead of domain_id.
     """
     logging.info("Processing a request to delete a DNS TXT record.")
     try:
         api_token, api_secret = get_environment_variables()
         req_body = req.get_json()
-        domain_id = req_body["domain_id"]
+        domain_name = req_body["domain_name"]
         record_id = req_body["record_id"]
-        result = await send_api_request(f"/domains/{domain_id}/dns/{record_id}", api_token, api_secret, method="DELETE")
+
+        # Fetch domain list
+        response = await send_api_request("/domains", api_token, api_secret)
+        if response.status_code != 200:
+            return func.HttpResponse(f"Failed to retrieve domains. HTTP {response.status_code}", status_code=400)
+
+        domains = response.json()
+        domain = next((d for d in domains if d["domain"] == domain_name), None)
         
+        if not domain:
+            return func.HttpResponse(f"Domain {domain_name} not found.", status_code=404)
+
+        domain_id = domain["id"]
+        result = await send_api_request(f"/domains/{domain_id}/dns/{record_id}", api_token, api_secret, method="DELETE")
+
         if result.status_code == 204:
             return func.HttpResponse(json.dumps({"success": True, "message": "DNS TXT record deleted successfully."}), status_code=200, mimetype="application/json")
         else:
