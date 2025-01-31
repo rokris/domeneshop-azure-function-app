@@ -42,7 +42,7 @@ You can interact with the Azure Function using **HTTPie**. Below are examples of
 http POST https://<YOUR_FUNCTION_APP_NAME>.azurewebsites.net/api/add_dns_txt \
     x-functions-key:<YOUR_FUNCTION_KEY> \
     Content-Type:application/json \
-    domain_id=<YOUR_DOMAIN_ID> \
+    domain_name=<YOUR_DOMAIN_NAME> \
     record_name="<YOUR_RECORD_NAME>" \
     txt_value="<YOUR_TXT_VALUE>" \
     ttl:=3600  # Optional
@@ -53,7 +53,7 @@ http POST https://<YOUR_FUNCTION_APP_NAME>.azurewebsites.net/api/add_dns_txt \
 http DELETE https://<YOUR_FUNCTION_APP_NAME>.azurewebsites.net/api/delete_dns_txt \
     x-functions-key:<YOUR_FUNCTION_KEY> \
     Content-Type:application/json \
-    domain_id=<YOUR_DOMAIN_ID> \
+    domain_name=<YOUR_DOMAIN_NAME> \
     record_id=<YOUR_RECORD_ID>
 ```
 
@@ -72,7 +72,7 @@ http GET "https://<YOUR_FUNCTION_APP_NAME>.azurewebsites.net/api/list_txt_record
 ### **Replace the Following Placeholders:**
 - `<YOUR_FUNCTION_APP_NAME>`: Your **Azure Function App** name.
 - `<YOUR_FUNCTION_KEY>`: The **Function Key** for authentication.
-- `<YOUR_DOMAIN_ID>`, `<YOUR_RECORD_ID>`, `<YOUR_RECORD_NAME>`, and `<YOUR_TXT_VALUE>` with your **actual values**.
+- `<YOUR_DOMAIN_NAME>`, `<YOUR_RECORD_ID>`, `<YOUR_RECORD_NAME>`, and `<YOUR_TXT_VALUE>` with your **actual values**.
 
 ---
 

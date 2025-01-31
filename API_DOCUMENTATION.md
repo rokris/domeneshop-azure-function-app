@@ -38,7 +38,7 @@ Content-Type: application/json
 #### **Body:**
 ```json
 {
-  "domain_id": "<DOMAIN_ID>",
+  "domain_name": "<DOMAIN_NAME>",
   "record_name": "<RECORD_NAME>",
   "txt_value": "<TXT_VALUE>",
   "ttl": 3600  // Optional, default: 3600
@@ -79,7 +79,7 @@ Content-Type: application/json
 #### **Body:**
 ```json
 {
-  "domain_id": "<DOMAIN_ID>",
+  "domain_name": "<DOMAIN_NAME>",
   "record_id": "<RECORD_ID>"
 }
 ```
