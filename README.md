@@ -1,4 +1,4 @@
-# Azure Function App for Managing DNS TXT Records with Domeneshop
+# Azure Function App for Managing DNS TXT Records with DomeneShop
 [![Super-Linter](https://github.com/rokris/domeneshop-azure-function-app/actions/workflows/superlint.yml/badge.svg)](https://github.com/marketplace/actions/super-linter)
 
 This Azure Function enables the addition of DNS TXT records to the Domeneshop DNS service via HTTP requests.
